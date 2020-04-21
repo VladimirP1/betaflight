@@ -1597,7 +1597,6 @@ static bool mspProcessOutCommand(int16_t cmdMSP, sbuf_t *dst)
         sbufWriteU8(dst, blackboxGetRateDenom());
         sbufWriteU16(dst, blackboxGetPRatio());
         sbufWriteU8(dst, blackboxConfig()->sample_rate);
-        sbufWriteU16(dst, blackboxConfig()->fields);
 #else
         sbufWriteU8(dst, 0); // Blackbox not supported
         sbufWriteU8(dst, 0);
@@ -1605,7 +1604,6 @@ static bool mspProcessOutCommand(int16_t cmdMSP, sbuf_t *dst)
         sbufWriteU8(dst, 0);
         sbufWriteU16(dst, 0);
         sbufWriteU8(dst, 0);
-        sbufWriteU16(dst, 0);
 #endif
         break;
 
@@ -2734,9 +2732,6 @@ static mspResult_e mspProcessInCommand(mspDescriptor_t srcDesc, int16_t cmdMSP, 
             } else {
                 // p_ratio not specified in MSP, so calculate it from old rateNum and rateDenom
                 blackboxConfigMutable()->p_ratio = blackboxCalculatePDenom(rateNum, rateDenom);
-            }
-            if (sbufBytesRemaining(src) >= 2) {
-                blackboxConfigMutable()->fields = sbufReadU16(src);
             }
         }
         break;

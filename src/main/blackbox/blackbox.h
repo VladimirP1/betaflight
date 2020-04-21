@@ -53,7 +53,7 @@ typedef enum FlightLogEvent {
 typedef struct blackboxConfig_s {
     uint16_t p_ratio; // I-frame interval / P-frame interval
     uint8_t device;
-    uint16_t fields;
+    uint32_t fields_mask; // 1 to not log that field, 0 to log that field
     uint8_t mode;
 } blackboxConfig_t;
 
