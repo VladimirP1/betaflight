@@ -29,6 +29,8 @@
 
 #ifdef USE_UART
 
+#include "io/serial.h"
+
 #include "drivers/system.h"
 #include "drivers/dma.h"
 #include "drivers/io.h"
@@ -355,8 +357,19 @@ uartPort_t *serialUART(UARTDevice_e device, uint32_t baudRate, portMode_e mode, 
         RCC_ClockCmd(hardware->rcc, ENABLE);
     }
 
-    IO_t txIO = IOGetByTag(uartdev->tx.pin);
-    IO_t rxIO = IOGetByTag(uartdev->rx.pin);
+    IO_t txIO, rxIO;
+    uint8_t tx_af, rx_af;
+    if (!(serialConfig_System.rxtx_swapmask & (1 << getUartIndexByAddr(s->USARTx)))) {
+        tx_af = uartdev->tx.af;
+        rx_af = uartdev->rx.af;
+        txIO = IOGetByTag(uartdev->tx.pin);
+        rxIO = IOGetByTag(uartdev->rx.pin);
+    } else {
+        tx_af = uartdev->rx.af;
+        rx_af = uartdev->tx.af;
+        txIO = IOGetByTag(uartdev->rx.pin);
+        rxIO = IOGetByTag(uartdev->tx.pin);
+    }
 
     if ((options & SERIAL_BIDIR) && txIO) {
         ioConfig_t ioCfg = IO_CONFIG(
@@ -366,17 +379,17 @@ uartPort_t *serialUART(UARTDevice_e device, uint32_t baudRate, portMode_e mode, 
         );
 
         IOInit(txIO, OWNER_SERIAL_TX, RESOURCE_INDEX(device));
-        IOConfigGPIOAF(txIO, ioCfg, uartdev->tx.af);
+        IOConfigGPIOAF(txIO, ioCfg, tx_af);
     }
     else {
         if ((mode & MODE_TX) && txIO) {
             IOInit(txIO, OWNER_SERIAL_TX, RESOURCE_INDEX(device));
-            IOConfigGPIOAF(txIO, IOCFG_AF_PP, uartdev->tx.af);
+            IOConfigGPIOAF(txIO, IOCFG_AF_PP, tx_af);
         }
 
         if ((mode & MODE_RX) && rxIO) {
             IOInit(rxIO, OWNER_SERIAL_RX, RESOURCE_INDEX(device));
-            IOConfigGPIOAF(rxIO, IOCFG_AF_PP, uartdev->rx.af);
+            IOConfigGPIOAF(rxIO, IOCFG_AF_PP, rx_af);
         }
     }
 

@@ -20,3 +20,16 @@
 
 // Needed to suppress the pedantic warning about an empty file
 #include <stddef.h>
+
+#include "io/serial.h"
+#include "drivers/serial.h"
+#include "drivers/serial_uart.h"
+
+
+void usartTargetConfigure(uartPort_t *uartPort)
+{
+    if (serialConfig_System.rxtx_swapmask & (1 << getUartIndexByAddr(uartPort->USARTx))) {
+        uartPort->Handle.AdvancedInit.AdvFeatureInit |= UART_ADVFEATURE_SWAP_INIT;
+        uartPort->Handle.AdvancedInit.Swap = UART_ADVFEATURE_SWAP_ENABLE;
+    }
+}
