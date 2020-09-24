@@ -391,4 +391,21 @@ UART_IRQHandler(UART, 8, 8)  // UART8 Rx/Tx IRQ Handler
 UART_IRQHandler(LPUART, 1, 9) // UART9 (implemented with LPUART1) Rx/Tx IRQ Handler
 #endif
 
+uint8_t getUartIndexByAddr(USART_TypeDef* addr) {
+    const USART_TypeDef *uarts[] = {
+        USART1,
+        USART2,
+        USART3,
+        UART4,
+        UART5,
+        USART6,
+    };
+    for (uint8_t i = 0; i < (sizeof(uarts)/sizeof(uarts[0])); ++i) {
+        if (uarts[i] == addr) {
+            return i;
+        }
+    }
+    return 0xff;
+}
+
 #endif // USE_UART
